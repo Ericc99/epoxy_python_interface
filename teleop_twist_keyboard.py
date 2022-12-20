@@ -11,6 +11,8 @@ from geometry_msgs.msg import Twist
 
 import sys, select, termios, tty
 
+# Message to be printed as instructions
+
 msg = """
 Reading from the keyboard  and Publishing to Twist!
 ---------------------------
@@ -36,6 +38,8 @@ e/c : increase/decrease only angular speed by 10%
 
 CTRL-C to quit
 """
+
+# Define the meanings of all the keys
 
 moveBindings = {
         'i':(1,0,0,0),
@@ -67,6 +71,9 @@ speedBindings={
         'c':(1,.9),
     }
 
+# Define a thread that can publish the commands from keyboard input
+# It has to be an isolated thread from the main loop or else it will get the whole program into a lagging mode
+
 class PublishThread(threading.Thread):
     def __init__(self, rate):
         super(PublishThread, self).__init__()
@@ -89,6 +96,8 @@ class PublishThread(threading.Thread):
 
         self.start()
 
+   # Waiting for subscribers if not already connected
+      
     def wait_for_subscribers(self):
         i = 0
         while not rospy.is_shutdown() and self.publisher.get_num_connections() == 0:
@@ -100,6 +109,8 @@ class PublishThread(threading.Thread):
         if rospy.is_shutdown():
             raise Exception("Got shutdown request before subscribers connected")
 
+   #Update util function to update the whole status of publisher
+   
     def update(self, x, y, z, th, speed, turn):
         self.condition.acquire()
         self.x = x
@@ -111,13 +122,14 @@ class PublishThread(threading.Thread):
         # Notify publish thread that we have a new message.
         self.condition.notify()
         self.condition.release()
-
+         
     def stop(self):
         self.done = True
         self.update(0, 0, 0, 0, 0, 0)
         self.join()
 
     def run(self):
+      # The data type of the parameter that is passed as a collection to the car is type Twist
         twist = Twist()
         while not self.done:
             self.condition.acquire()
