@@ -14,7 +14,7 @@ def pub():
 
 def move():
     twist = Twist()
-    twist.linear.x = 1
+    twist.linear.x = 0.3
     twist.linear.y = 0
     twist.linear.z = 0
     twist.angular.x = 0
