@@ -29,6 +29,7 @@ def timer(duration):
     return  
 
 if __name__ == '__main__':
+    rospy.init_node('Testing_Node')
     global pub_cmd
     pub_cmd = 0
     T = threading.Thread(target = pub, args=[])
