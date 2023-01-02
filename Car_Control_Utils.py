@@ -58,7 +58,7 @@ class CarControl():
     # Several default modes to go according to the predefined mode
     def default(self, pattern):
         if pattern == '1':
-            print('Performing pattern 1: ')
+            print('------Forwarding 1m------')
             speed =  [0.03, 0, 0, 0]
             self.update(True, speed)
             time.sleep(0.2)
@@ -73,7 +73,7 @@ class CarControl():
             time.sleep(0.2)
             speed =  [0.154, 0, 0, 0]
             self.update(True, speed)
-            time.sleep(4)
+            time.sleep(5.5)
             speed =  [0.12, 0, 0, 0]
             self.update(True, speed)
             time.sleep(0.2)
@@ -88,6 +88,15 @@ class CarControl():
             time.sleep(0.2)
             speed =  [0, 0, 0, 0]
             self.update(False, speed)
+
+        elif pattern == '2':
+            print('------Turning 90 degrees right------')
+            speed = [0,0,0,0.2]
+            self.update(True, speed)
+            time.sleep(3)
+            speed = [0,0,0,0]
+            self.update(False, speed)
+            
         else:
             pass
     
@@ -108,7 +117,8 @@ if __name__ == '__main__':
             speed =  [0, 0, 0, 0]
             control.update(False, speed)
         elif usr_in == '2':
-            control.default('1')
+            tmp = input('Command: ')
+            control.default(tmp)
 
 
 
