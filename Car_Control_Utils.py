@@ -55,6 +55,42 @@ class CarControl():
             # Force format conversion in case there is anything wrong
             self.speed[i] = float(speed[i])
     
+    # Several default modes to go according to the predefined mode
+    def default(self, pattern):
+        if pattern == '1':
+            print('Performing pattern 1: ')
+            speed =  [0.03, 0, 0, 0]
+            self.update(True, speed)
+            time.sleep(0.2)
+            speed =  [0.06, 0, 0, 0]
+            self.update(True, speed)
+            time.sleep(0.2)
+            speed =  [0.09, 0, 0, 0]
+            self.update(True, speed)
+            time.sleep(0.2)
+            speed =  [0.12, 0, 0, 0]
+            self.update(True, speed)
+            time.sleep(0.2)
+            speed =  [0.154, 0, 0, 0]
+            self.update(True, speed)
+            time.sleep(4)
+            speed =  [0.12, 0, 0, 0]
+            self.update(True, speed)
+            time.sleep(0.2)
+            speed =  [0.09, 0, 0, 0]
+            self.update(True, speed)
+            time.sleep(0.2)
+            speed =  [0.06, 0, 0, 0]
+            self.update(True, speed)
+            time.sleep(0.2)
+            speed =  [0.03, 0, 0, 0]
+            self.update(True, speed)
+            time.sleep(0.2)
+            speed =  [0, 0, 0, 0]
+            self.update(False, speed)
+        else:
+            pass
+    
 if __name__ == '__main__':
     print('------Program Begins------')
     control = CarControl()
@@ -71,7 +107,9 @@ if __name__ == '__main__':
             time.sleep(1)
             speed =  [0, 0, 0, 0]
             control.update(False, speed)
-            
+        elif usr_in == '2':
+            control.default('1')
+
 
 
 
