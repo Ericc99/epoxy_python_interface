@@ -51,7 +51,7 @@ class CarControl():
     # Update function used by main loop to modify the parameters
     def update(self, moving, speed):
         self.moving = moving
-        for i in range(3):
+        for i in range(4):
             # Force format conversion in case there is anything wrong
             self.speed[i] = float(speed[i])
     
@@ -90,13 +90,13 @@ class CarControl():
             self.update(False, speed)
 
         elif pattern == '2':
-            print('------Turning 90 degrees right------')
-            speed = [0,0,0,0.2]
+            print('------Turning 90 degrees left------')
+            speed = [0,0,0,0.49]
             self.update(True, speed)
             time.sleep(3)
             speed = [0,0,0,0]
             self.update(False, speed)
-            
+
         else:
             pass
     
