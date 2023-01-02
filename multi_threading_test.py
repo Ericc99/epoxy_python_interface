@@ -3,6 +3,12 @@ import time
 import rospy
 from geometry_msgs.msg import Twist
 
+#  The requested spped of movement is around 20cm/s
+# it refers to around 0.154 in linear speed parameter
+# the acceleration process will cost around 1s
+# it will go thorugh 0.05 at 0.33s, o.1 at 0.66s and 0.154 at 1s
+# the decelerate process will follow the similar step.
+
 def pub():
     while True:
         if pub_cmd == 0:
