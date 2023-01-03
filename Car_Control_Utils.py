@@ -1,5 +1,6 @@
 import rospy, threading, time
 from geometry_msgs.msg import Twist
+import Car_Control_Data
 
 class CarControl():
     def __init__(self):
@@ -58,47 +59,22 @@ class CarControl():
     # Several default modes to go according to the predefined mode
     def default(self, pattern):
         if pattern == '1':
-            print('------Forwarding 1m------')
-            speed =  [0.03, 0, 0, 0]
-            self.update(True, speed)
-            time.sleep(0.2)
-            speed =  [0.06, 0, 0, 0]
-            self.update(True, speed)
-            time.sleep(0.2)
-            speed =  [0.09, 0, 0, 0]
-            self.update(True, speed)
-            time.sleep(0.2)
-            speed =  [0.12, 0, 0, 0]
-            self.update(True, speed)
-            time.sleep(0.2)
-            speed =  [0.154, 0, 0, 0]
-            self.update(True, speed)
-            time.sleep(5.5)
-            speed =  [0.12, 0, 0, 0]
-            self.update(True, speed)
-            time.sleep(0.2)
-            speed =  [0.09, 0, 0, 0]
-            self.update(True, speed)
-            time.sleep(0.2)
-            speed =  [0.06, 0, 0, 0]
-            self.update(True, speed)
-            time.sleep(0.2)
-            speed =  [0.03, 0, 0, 0]
-            self.update(True, speed)
-            time.sleep(0.2)
-            speed =  [0, 0, 0, 0]
-            self.update(False, speed)
-
+            preset = Car_Control_Data.pattern1
         elif pattern == '2':
-            print('------Turning 90 degrees left------')
-            speed = [0,0,0,0.49]
-            self.update(True, speed)
-            time.sleep(3)
-            speed = [0,0,0,0]
-            self.update(False, speed)
-
+            preset = Car_Control_Data.pattern2
         else:
-            pass
+            preset = None
+            
+        if not (preset is None):
+            print(preset.name)
+            for i in range(len(preset.delay)):
+                if i < len(preset.delay) - 1:
+                    self.update(True, preset.speed[i])
+                else:
+                    self.update(False, preset.speed[i])
+                time.sleep(preset.delay[i])
+
+
     
 if __name__ == '__main__':
     print('------Program Begins------')
