@@ -1,6 +1,6 @@
 import rospy, threading, time
 from geometry_msgs.msg import Twist
-import Car_Control_Data
+from Car_Control_Data import patterns as preset_data
 
 class CarControl():
     def __init__(self):
@@ -58,14 +58,9 @@ class CarControl():
     
     # Several default modes to go according to the predefined mode
     def default(self, pattern):
-        if pattern == '1':
-            preset = Car_Control_Data.pattern1
-        elif pattern == '2':
-            preset = Car_Control_Data.pattern2
-        else:
-            preset = None
-            
-        if not (preset is None):
+        usr_in = int(pattern)
+        if usr_in >= 1 and usr_in <= len(preset_data) - 1:
+            preset = preset_data[int(usr_in)]
             print(preset.name)
             for i in range(len(preset.delay)):
                 if i < len(preset.delay) - 1:
@@ -73,29 +68,34 @@ class CarControl():
                 else:
                     self.update(False, preset.speed[i])
                 time.sleep(preset.delay[i])
+        else:
+            pass
+
+    def run(self):
+        print('------Program Begins------')
+        control = self
+        control.start()
+        while True:
+            usr_in = input('Command: ')
+            if usr_in == '0':
+                print('------Program Terminated------')
+                break
+            elif usr_in == '1':
+                # Default moving mode speed 0.154 forward 1s
+                speed =  [0.154, 0, 0, 0]
+                control.update(True, speed)
+                time.sleep(1)
+                speed =  [0, 0, 0, 0]
+                control.update(False, speed)
+            elif usr_in == '2':
+                tmp = input('Command: ' + preset_data[0])
+                control.default(tmp)
 
 
     
 if __name__ == '__main__':
-    print('------Program Begins------')
     control = CarControl()
-    control.start()
-    while True:
-        usr_in = input('Command: ')
-        if usr_in == '0':
-            print('------Program Terminated------')
-            break
-        elif usr_in == '1':
-            # Default moving mode speed 0.154 forward 1s
-            speed =  [0.154, 0, 0, 0]
-            control.update(True, speed)
-            time.sleep(1)
-            speed =  [0, 0, 0, 0]
-            control.update(False, speed)
-        elif usr_in == '2':
-            tmp = input('Command: ')
-            control.default(tmp)
-
+    control.run()
 
 
 
