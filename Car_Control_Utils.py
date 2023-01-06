@@ -1,6 +1,7 @@
 import rospy, threading, time
 from geometry_msgs.msg import Twist
 from Car_Control_Data import patterns as preset_data
+from sensor_msgs.msg import Imu
 
 class CarControl():
     def __init__(self):
@@ -10,6 +11,8 @@ class CarControl():
         self.speed = [0, 0, 0, 0]
         self.running = False
         self.thread = None
+        self.listening = False
+        self.thread_listen = None
     
     # Function start, first to call after the __init__ function to start essentail things for the class and ROS
     # Can only be called once
@@ -25,6 +28,15 @@ class CarControl():
             self.thread.start()
             # Change the running status to True
             self.running = True
+            # Status of listener
+            self.listening = False
+            # Start the listener thread
+            self.thread_listen = threading.Thread(target=self.listen, args=[])
+            # Set as daemon thread to end with the main thread
+            self.thread_listen.setDaemon(True)
+            # Start the listening thread
+            self.thread_listen.start()
+
         else:
             pass
 
@@ -70,6 +82,14 @@ class CarControl():
                 time.sleep(preset.delay[i])
         else:
             pass
+    # Listener towards the IMU data
+    def listen(self):
+        while True:
+            if self.listening == True:
+                print('GG')
+                time.sleep(1)
+            else:
+                pass
 
     # Run function for the mainloop
     def run(self):
@@ -91,6 +111,16 @@ class CarControl():
             elif usr_in == '2':
                 tmp = input('Command: ' + preset_data[0])
                 control.default(tmp)
+            elif usr_in == '3':
+                print('Listen Trigger')
+                if self.listening == True:
+                    print('---Stopped Listening---')
+                    self.listening = False
+                else:
+                    print('---Started Listening---')
+                    self.listening = True
+            else:
+                pass
 
 
     
