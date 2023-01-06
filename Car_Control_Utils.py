@@ -12,7 +12,8 @@ class CarControl():
         self.running = False
         self.thread = None
         self.listening = False
-        self.thread_listen = None
+        self.subscriber = None
+        self.movements = None
     
     # Function start, first to call after the __init__ function to start essentail things for the class and ROS
     # Can only be called once
@@ -31,11 +32,7 @@ class CarControl():
             # Status of listener
             self.listening = False
             # Start the listener thread
-            self.thread_listen = threading.Thread(target=self.listen, args=[])
-            # Set as daemon thread to end with the main thread
-            self.thread_listen.setDaemon(True)
-            # Start the listening thread
-            self.thread_listen.start()
+            self.subscriber = rospy.Subscriber('/imu', Imu, self.listen, queue_size=1000)
 
         else:
             pass
@@ -83,13 +80,12 @@ class CarControl():
         else:
             pass
     # Listener towards the IMU data
-    def listen(self):
-        while True:
-            if self.listening == True:
-                print('GG')
-                time.sleep(1)
-            else:
-                pass
+    def listen(self, imu):
+        if self.listening == True:
+            # rospy.loginfo(imu.header)
+            rospy.loginfo(imu.linear_acceleration.x)
+        else:
+            pass
 
     # Run function for the mainloop
     def run(self):
@@ -112,7 +108,6 @@ class CarControl():
                 tmp = input('Command: ' + preset_data[0])
                 control.default(tmp)
             elif usr_in == '3':
-                print('Listen Trigger')
                 if self.listening == True:
                     print('---Stopped Listening---')
                     self.listening = False

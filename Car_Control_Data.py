@@ -10,6 +10,38 @@ class Moving_Preset_Pattern():
     def Set_Delay(self, delay):
         self.delay = delay
 
+class IMU_Location_Info():
+    def __init__(self):
+        self.dis_x = 0
+        self.dis_y = 0
+        self.dis_z = 0
+
+        self.ang_x = 0
+        self.ang_y = 0
+        self.ang_z = 0
+
+        self.lin_vel_x = 0
+        self.lin_vel_y = 0
+        self.lin_vel_z = 0
+
+        self.ang_vel_x = 0
+        self.ang_vel_y = 0
+        self.ang_vel_z = 0
+
+    # Function to make adjustment and calabration
+    def calabrate(self):
+        pass
+
+    # Function to calculate and update the data
+    def Update(self):
+        pass
+
+    # Function to clear the data frame
+    def Clear(self):
+        pass
+    
+
+
 pattern_intro = '''
 Pattern 1: Forward 1m
 Pattern 2: 90 Degrees Left
