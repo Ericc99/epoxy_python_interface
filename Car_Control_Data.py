@@ -1,3 +1,72 @@
+# Location Data Structure
+class Location():
+    def __init__(self):
+        # Time:
+        self.now = Time_Stamp()
+        self.start_time = Time_Stamp()
+        self.duration = 0
+
+        # Orientation Data: Megnatic Sensor
+        self.orientation_x = 0
+        self.orientation_y = 0
+        self.orientation_z = 0
+
+        # Linear Acceleration
+        self.lin_acc_x = 0
+        self.lin_acc_y = 0
+        self.lin_acc_z = 0
+
+        # Linear Velocity
+        self.lin_vel_x = 0
+        self.lin_vel_y = 0
+        self.lin_vel_z = 0
+
+        # Realtive Location
+        self.loc_x = 0
+        self.loc_y = 0
+        self.loc_z = 0
+
+        # Angular Velocity
+        self.ang_vel_x = 0
+        self.ang_vel_y = 0
+        self.ang_vel_z = 0
+
+# Time Stamp Data Structure
+class Time_Stamp():
+    def __init__(self):
+        self.start = Instance()
+        self.now = Instance()
+
+    # Init Time Stamp, set start time
+    def Init(self, sec, nsec):
+        self.start.Update(sec, nsec)
+        self.now.Update(sec, nsec)
+
+    # Update time stamp, update now
+    def Update(self, sec, nsec):
+        self.now.Update(sec, nsec)
+
+    # Calculate time since start
+    def Duration(self):
+        delta_sec = self.now.sec - self.start.sec
+        delta_nsec = self.now.nsec - self.start.nsec
+        return [delta_sec, delta_nsec]        
+
+# Time Instances
+class Instance():
+    def __init__(self):
+        self.sec = 0
+        self.nsec = 0
+    
+    # Update the time instance data
+    def Update(self, sec, nsec):
+        self.sec = sec
+        self.nsec = nsec
+
+
+
+
+# Routing Pattern Data Structure
 class Moving_Preset_Pattern():
     def __init__(self, name):
         self.name = name
@@ -10,44 +79,8 @@ class Moving_Preset_Pattern():
     def Set_Delay(self, delay):
         self.delay = delay
 
-class Location_Info():
-    def __init__(self):
-        # Orientation Data: Megnatic Sensor
-        self.orientation_x = 0
-        self.orientation_y = 0
-        self.orientation_z = 0
 
-        # 
-        self.dis_x = 0
-        self.dis_y = 0
-        self.dis_z = 0
-
-        self.ang_x = 0
-        self.ang_y = 0
-        self.ang_z = 0
-
-        self.lin_vel_x = 0
-        self.lin_vel_y = 0
-        self.lin_vel_z = 0
-
-        self.ang_vel_x = 0
-        self.ang_vel_y = 0
-        self.ang_vel_z = 0
-
-    # Function to make adjustment and calabration
-    def calabrate(self):
-        pass
-
-    # Function to calculate and update the data
-    def Update(self):
-        pass
-
-    # Function to clear the data frame
-    def Clear(self):
-        pass
-
-
-
+# Pattern Intro Message
 pattern_intro = '''
 Pattern 1: Forward 1m
 Pattern 2: 90 Degrees Left
@@ -57,6 +90,7 @@ Pattern 5: 3m Forward
 Pattern 6: Full Set
 '''
 
+# Pattern definitions
 pattern1 = Moving_Preset_Pattern('Forward 1m')
 speed1 = [
     [0.03, 0, 0, 0],
@@ -157,5 +191,5 @@ delay6 = delay5 + delay_delay + delay2 + delay1 + delay2 + delay7 + delay_delay 
 pattern6.Set_Speed(speed6)
 pattern6.Set_Delay(delay6)
 
-
+# Pattern list, need to register all useful patterns
 patterns = [pattern_intro, pattern1, pattern2, pattern3, pattern4, pattern5, pattern6, pattern7]
