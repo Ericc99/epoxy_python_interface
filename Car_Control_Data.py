@@ -1,10 +1,12 @@
+from squaternion import Quaternion
 # Location Data Structure
 class Location():
     def __init__(self):
+        # Activation 
+        self.activated = False
+
         # Time:
-        self.now = Time_Stamp()
-        self.start_time = Time_Stamp()
-        self.duration = 0
+        self.time = Time_Stamp()
 
         # Orientation Data: Megnatic Sensor
         self.orientation_x = 0
@@ -30,6 +32,31 @@ class Location():
         self.ang_vel_x = 0
         self.ang_vel_y = 0
         self.ang_vel_z = 0
+    
+    def Update(self, imu):
+        # First time plugin data
+        if self.activated == False:
+            # Data type of Time: from genpy.rostime import Time
+            self.time.Init(imu.header.stamp.secs, imu.header.stamp.nsecs)
+            self.activated = True
+        # Normal Updates
+        # Time Update
+        self.time.Update(imu.header.stamp.secs, imu.header.stamp.nsecs)
+        # Orientation Update
+        quaternion = Quaternion(imu.orientation.w, imu.orientation.x, imu.orientation.y, imu.orientation.z)
+        euler = quaternion.to_euler(degrees=True)
+        self.orientation_x = euler[0]
+        self.orientation_y = euler[1]
+        self.orientation_z = euler[2]
+    
+    def Print(self):
+        display = 'Status:\n' + str(self.time.Print())
+        return display
+        
+
+        
+
+        
 
 # Time Stamp Data Structure
 class Time_Stamp():
@@ -48,9 +75,18 @@ class Time_Stamp():
 
     # Calculate time since start
     def Duration(self):
-        delta_sec = self.now.sec - self.start.sec
         delta_nsec = self.now.nsec - self.start.nsec
-        return [delta_sec, delta_nsec]        
+        delta_sec = self.now.sec - self.start.sec
+        if delta_nsec < 0:
+            delta_sec = delta_sec -1
+            delta_nsec = delta_nsec + 1000000000
+        
+        return [delta_sec, delta_nsec]
+    
+    # Dispaly Time Info
+    def Print(self):
+        display = 'Time: \n' + 'Starting Time: \n' + self.start.Print() + 'Now: \n' + self.now.Print() + 'Duration: ' + str(self.Duration()) + '\n'
+        return display
 
 # Time Instances
 class Instance():
@@ -62,6 +98,11 @@ class Instance():
     def Update(self, sec, nsec):
         self.sec = sec
         self.nsec = nsec
+
+    # Display Instance Info
+    def Print(self):
+        display = 'sec: ' + str(self.sec) + ' nsec: ' + str(self.nsec) + '\n'
+        return display
 
 
 

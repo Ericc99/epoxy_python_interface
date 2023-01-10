@@ -1,8 +1,8 @@
 import rospy, threading, time
 from geometry_msgs.msg import Twist
 from Car_Control_Data import patterns as preset_data
+from Car_Control_Data import Location
 from sensor_msgs.msg import Imu
-from squaternion import Quaternion
 
 class CarControl():
     def __init__(self):
@@ -16,6 +16,7 @@ class CarControl():
         self.subscriber = None
         self.movements = None
         self.counter = 0
+        self.location = None
     
     # Function start, first to call after the __init__ function to start essentail things for the class and ROS
     # Can only be called once
@@ -35,6 +36,8 @@ class CarControl():
             self.listening = False
             # Start the listener thread
             self.subscriber = rospy.Subscriber('/imu', Imu, self.listen, queue_size=1000)
+            # Construct the Location data structure without init
+            self.location = Location()
 
         else:
             pass
@@ -88,14 +91,9 @@ class CarControl():
         if self.listening == True:
             # Retrive the orientation data in the format of Quanternion
             # Data comes from the Megnatic sensor within the IMU module
-            x = imu.orientation.x
-            y = imu.orientation.y
-            z = imu.orientation.z
-            w = imu.orientation.w
-            q = Quaternion(w, x, y, z)
-            e = q.to_euler(degrees=True)
+            self.location.Update(imu)
             if self.counter % 50 == 0:
-                rospy.loginfo(e)
+                rospy.loginfo(str(self.location.Print()))
             self.counter += 1
         else:
             pass
