@@ -10,8 +10,14 @@ class Moving_Preset_Pattern():
     def Set_Delay(self, delay):
         self.delay = delay
 
-class IMU_Location_Info():
+class Location_Info():
     def __init__(self):
+        # Orientation Data: Megnatic Sensor
+        self.orientation_x = 0
+        self.orientation_y = 0
+        self.orientation_z = 0
+
+        # 
         self.dis_x = 0
         self.dis_y = 0
         self.dis_z = 0

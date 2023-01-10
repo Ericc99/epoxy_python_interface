@@ -86,15 +86,15 @@ class CarControl():
     # Listener towards the IMU data
     def listen(self, imu):
         if self.listening == True:
+            # Retrive the orientation data in the format of Quanternion
+            # Data comes from the Megnatic sensor within the IMU module
+            x = imu.orientation.x
+            y = imu.orientation.y
+            z = imu.orientation.z
+            w = imu.orientation.w
+            q = Quaternion(w, x, y, z)
+            e = q.to_euler(degrees=True)
             if self.counter % 50 == 0:
-                # rospy.loginfo(imu.header)
-                # rospy.loginfo(imu.orientation)
-                x = imu.orientation.x
-                y = imu.orientation.y
-                z = imu.orientation.z
-                w = imu.orientation.w
-                q = Quaternion(w, x, y, z)
-                e = q.to_euler(degrees=True)
                 rospy.loginfo(e)
             self.counter += 1
         else:
