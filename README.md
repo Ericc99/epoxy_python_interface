@@ -1,6 +1,6 @@
 # ROS
 
-## Discription
+## Discriptions
 
 This directory is designed for the ROS implementation of Construction Robotics. The major contributor is Eric CUI.
 
@@ -68,5 +68,5 @@ This directory is designed for the ROS implementation of Construction Robotics. 
     ```
     Detail reference can be seen within the Imu class of sensor_msgs.msg
     ```
-    
+
    
