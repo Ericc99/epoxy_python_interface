@@ -2,6 +2,7 @@ import rospy, threading, time
 from geometry_msgs.msg import Twist
 from Car_Control_Data import patterns as preset_data
 from sensor_msgs.msg import Imu
+from squaternion import Quaternion
 
 class CarControl():
     def __init__(self):
@@ -14,6 +15,7 @@ class CarControl():
         self.listening = False
         self.subscriber = None
         self.movements = None
+        self.counter = 0
     
     # Function start, first to call after the __init__ function to start essentail things for the class and ROS
     # Can only be called once
@@ -50,6 +52,8 @@ class CarControl():
                 twist.angular.x = 0
                 twist.angular.y = 0
                 twist.angular.z = self.speed[3]
+                # Print speed data
+                print('Speed: ' + str(self.speed))
                 # Publish the data to car
                 self.publisher.publish(twist)
                 # Command is being passed at a rate of 5Hz
@@ -82,8 +86,17 @@ class CarControl():
     # Listener towards the IMU data
     def listen(self, imu):
         if self.listening == True:
-            # rospy.loginfo(imu.header)
-            rospy.loginfo(imu.linear_acceleration.x)
+            if self.counter % 50 == 0:
+                # rospy.loginfo(imu.header)
+                # rospy.loginfo(imu.orientation)
+                x = imu.orientation.x
+                y = imu.orientation.y
+                z = imu.orientation.z
+                w = imu.orientation.w
+                q = Quaternion(w, x, y, z)
+                e = q.to_euler(degrees=True)
+                rospy.loginfo(e)
+            self.counter += 1
         else:
             pass
 
