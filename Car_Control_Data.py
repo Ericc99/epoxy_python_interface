@@ -70,10 +70,10 @@ pattern1.Set_Delay(delay1)
 
 pattern2 = Moving_Preset_Pattern('90 Degrees Left')
 speed2 = [
-    [0,0,0,0.49],
+    [0,0,0,0.5],
     [0,0,0,0]
 ]
-delay2 = [3, 0]
+delay2 = [3.2, 0]
 pattern2.Set_Speed(speed2)
 pattern2.Set_Delay(delay2)
 
