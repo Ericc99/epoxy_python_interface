@@ -1,4 +1,5 @@
 from squaternion import Quaternion
+from math import asin, atan2
 # Location Data Structure
 class Location():
     def __init__(self):
@@ -9,19 +10,13 @@ class Location():
         self.time = Time_Stamp()
 
         # Orientation Data: Megnatic Sensor
-        self.orientation_x = 0
-        self.orientation_y = 0
-        self.orientation_z = 0
+        self.orientation = Orientation_Status()
 
         # Linear Acceleration
-        self.lin_acc_x = 0
-        self.lin_acc_y = 0
-        self.lin_acc_z = 0
+        self.lin_acc = Linear_Acc()
 
         # Linear Velocity
-        self.lin_vel_x = 0
-        self.lin_vel_y = 0
-        self.lin_vel_z = 0
+        self.lin_vel = Linear_Vel()
 
         # Realtive Location
         self.loc_x = 0
@@ -29,9 +24,7 @@ class Location():
         self.loc_z = 0
 
         # Angular Velocity
-        self.ang_vel_x = 0
-        self.ang_vel_y = 0
-        self.ang_vel_z = 0
+        self.ang_vel = Angular_Vel()
     
     def Update(self, imu):
         # First time plugin data
@@ -43,19 +36,101 @@ class Location():
         # Time Update
         self.time.Update(imu.header.stamp.secs, imu.header.stamp.nsecs)
         # Orientation Update
-        quaternion = Quaternion(imu.orientation.w, imu.orientation.x, imu.orientation.y, imu.orientation.z)
-        euler = quaternion.to_euler(degrees=True)
-        self.orientation_x = euler[0]
-        self.orientation_y = euler[1]
-        self.orientation_z = euler[2]
+        self.orientation.Update(imu.orientation.w, imu.orientation.x, imu.orientation.y, imu.orientation.z)
+        # Angular Velocity Update
+        self.ang_vel.Update(imu.angular_velocity.x, imu.angular_velocity.y, imu.angular_velocity.z)
+        # Linear Acceleration Update
+        self.lin_acc.Update(imu.linear_acceleration.x, imu.linear_acceleration.y, imu.linear_acceleration.z)
+    
+    def Calculate_Vel(self):
+        pass
+
     
     def Print(self):
-        display = 'Status:\n' + str(self.time.Print())
+        display = 'Status:\n' + str(self.time.Print()) + str(self.orientation.Print()) + str(self.ang_vel.Print()) + str(self.lin_acc.Print())
+        # display = str(self.time.Print())
+
         return display
-        
 
-        
+# Linear Velocity Data Structure
+class Linear_Vel():
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.z = 0
+    
+    def Update(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+    
+    def Print(self):
+        display = 'Linear Velocity: \n' + 'x: ' + str(self.x) + ' \ny: ' + str(self.y) + ' \nz: ' + str(self.z) + '\n'
+        return display
 
+# Linear Acceleration Data Structure
+class Linear_Acc():
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.z = 0
+    
+    def Update(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def Print(self):
+        display = 'Linear Acceleration: \n' + 'x: ' + str(self.x) + ' \ny: ' + str(self.y) + ' \nz: ' + str(self.z) + '\n'
+        return display
+
+# Angular Acceleration Data Structure
+class Angular_Vel():
+    # Unit of Angular Velocity is Rad/Sec
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.z = 0
+    
+    def Update(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+    
+    def Print(self):
+        display = 'Angular Velocity: \n' + 'x: ' + str(self.x) + ' \ny: ' + str(self.y) + ' \nz: ' + str(self.z) + '\n'
+        return display
+
+
+# Orientation Data Structure
+class Orientation_Status():
+    def __init__(self):
+        # This x, y, z refer to the euler angles but not the quaternions
+        self.x = 0
+        self.y = 0
+        self.z = 0
+    
+    # Input quaternions and record eulers
+    def Update(self,w, x, y, z):
+        # pitch = asin(-2 * q1 * q3 + 2 * q0* q2)
+        # roll  = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2* q2 + 1)
+        # yaw   = atan2(2*(q1*q2 + q0*q3),q0*q0+q1*q1-q2*q2-q3*q3)
+
+
+        quanternion = Quaternion(w, x, y, z)
+        euler = quanternion.to_euler(degrees=True)
+        self.x = euler[0]
+        self.y = euler[1]
+        self.z = euler[2]
+
+        # self.z = yaw
+        # self.x = roll
+        # self.y = pitch
+    
+    # Display Orientation Info
+    def Print(self):
+        display = 'Orientation:\n' + 'x: ' + str(self.x) + ' \ny: ' + str(self.y) + ' \nz: ' + str(self.z) + '\n'
+        return display
         
 
 # Time Stamp Data Structure

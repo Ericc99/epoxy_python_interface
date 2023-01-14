@@ -4,6 +4,11 @@ from Car_Control_Data import patterns as preset_data
 from Car_Control_Data import Location
 from sensor_msgs.msg import Imu
 
+import io
+import sys
+
+sys.stdout = io.TextIOWrapper(io.BufferedWriter(sys.stdout.buffer, 100000))
+
 class CarControl():
     def __init__(self):
         # Define some global variables around the whole class
@@ -17,6 +22,7 @@ class CarControl():
         self.movements = None
         self.counter = 0
         self.location = None
+        self.time = time.time()
     
     # Function start, first to call after the __init__ function to start essentail things for the class and ROS
     # Can only be called once
@@ -91,10 +97,17 @@ class CarControl():
         if self.listening == True:
             # Retrive the orientation data in the format of Quanternion
             # Data comes from the Megnatic sensor within the IMU module
+            # self.time = time.time()
             self.location.Update(imu)
-            if self.counter % 50 == 0:
-                rospy.loginfo(str(self.location.Print()))
-            self.counter += 1
+            # print('update:', time.time() - self.time)
+            # self.time = time.time()
+            # with open('./Log.txt', 'a') as f:
+                # if self.counter % 50 == 0:
+            # rospy.loginfo(str(self.location.Print()))
+            print(str(self.location.Print()), flush=True, )
+                # print(str(self.location.Print()), file=f)
+                # self.counter += 1
+            # print('print', time.time() - self.time)
         else:
             pass
 
