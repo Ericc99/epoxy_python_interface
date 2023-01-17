@@ -7,7 +7,8 @@ from sensor_msgs.msg import Imu
 import io
 import sys
 
-sys.stdout = io.TextIOWrapper(io.BufferedWriter(sys.stdout.buffer, 100000))
+# Modify buffer of print function
+# sys.stdout = io.TextIOWrapper(io.BufferedWriter(sys.stdout.buffer, 100000))
 
 class CarControl():
     def __init__(self):
@@ -99,12 +100,14 @@ class CarControl():
             # Data comes from the Megnatic sensor within the IMU module
             # self.time = time.time()
             self.location.Update(imu)
+            self.location.Calculate_Vel()
+            self.location.Calculate_Dis()
             # print('update:', time.time() - self.time)
             # self.time = time.time()
             # with open('./Log.txt', 'a') as f:
                 # if self.counter % 50 == 0:
             # rospy.loginfo(str(self.location.Print()))
-            print(str(self.location.Print()), flush=True, )
+            # print(str(self.location.Print()), flush=True)
                 # print(str(self.location.Print()), file=f)
                 # self.counter += 1
             # print('print', time.time() - self.time)

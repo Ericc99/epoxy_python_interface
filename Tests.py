@@ -1,4 +1,5 @@
 # To Operate Some Tests.
+from math import cos
 
 class Time_Stamp():
     def __init__(self):
@@ -16,8 +17,9 @@ class Time_Stamp():
 
 
 if __name__ == '__main__':
-    start = Time_Stamp()
-    start.Modify(0, 0)
-    end = Time_Stamp()
-    end.Modify(10, 10)
-    end.TimeSinceStart(start)
+    # start = Time_Stamp()
+    # start.Modify(0, 0)
+    # end = Time_Stamp()
+    # end.Modify(10, 10)
+    # end.TimeSinceStart(start)
+    print(cos(90))
