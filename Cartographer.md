@@ -57,19 +57,4 @@ Then all you have to do is to upgrade Sphinx.
 pip install Sphinx --upgrade
 ```
 
-sudo apt-get install -y \
-    cmake \
-    g++ \
-    git \
-    google-mock \
-    libboost-all-dev \
-    libcairo2-dev \
-    libeigen3-dev \
-    libgflags-dev \
-    libgoogle-glog-dev \
-    liblua5.2-dev \
-    libsuitesparse-dev \
-    libwebp-dev \
-    ninja-build \
-    protobuf-compiler \
-    python-sphinx
+然后就没有包的问题了，就出现了更奇怪的C object无法编译
