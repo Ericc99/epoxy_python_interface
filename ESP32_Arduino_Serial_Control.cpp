@@ -1,47 +1,35 @@
-/*
- * rosserial Service Server
- */
-
 #include <ros.h>
 #include <std_msgs/String.h>
 #include <rosserial_arduino/Test.h>
+#include <iostream>
 
-ros::NodeHandle  nh;
-using rosserial_arduino::Test;
+ros::NodeHandle nh;
 
-int i;
-void callback(const Test::Request & req, Test::Response & res){
-  if((i++)%2){
-    res.output = "Light Off";
-    digitalWrite(1, LOW);
-  }
-    
-  else{
-    res.output = "Light On";
+void messageCb( const std_msgs::String &msg)
+{
+  std::string opt(msg.data); // Extracting data from this std_msgs::String type thing
+  if(opt.compare("H") == 0)
+  {
     digitalWrite(1, HIGH);
   }
-    
+  else
+  {
+    digitalWrite(1, LOW);
+  }
+  // digitalWrite(1, HIGH-digitalRead(1));   // blink the led
 }
 
-ros::ServiceServer<Test::Request, Test::Response> server("test_srv",&callback);
-
-std_msgs::String str_msg;
-ros::Publisher chatter("chatter", &str_msg);
-
-char hello[13] = "hello world!";
+ros::Subscriber<std_msgs::String> sub("toggle", &messageCb );
 
 void setup()
 {
   pinMode(1, OUTPUT);
   nh.initNode();
-  nh.advertiseService(server);
-  nh.advertise(chatter);
+  nh.subscribe(sub);
 }
 
 void loop()
 {
-  str_msg.data = hello;
-  chatter.publish( &str_msg );
   nh.spinOnce();
-  delay(10);
-}
+  delay(1);
+} 
