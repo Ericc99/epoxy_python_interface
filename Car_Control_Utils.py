@@ -1,5 +1,6 @@
 import rospy, threading, time
 from geometry_msgs.msg import Twist
+from std_msgs.msg import String
 from Car_Control_Data import patterns as preset_data
 from Car_Control_Data import Location
 from sensor_msgs.msg import Imu
@@ -24,6 +25,10 @@ class CarControl():
         self.counter = 0
         self.location = None
         self.time = time.time()
+        self.pump_controller = rospy.Publisher('toggle',String, queue_size=1)
+        self.pump_thread = None
+        self.pumping = False
+        self.pump_trigger = False
     
     # Function start, first to call after the __init__ function to start essentail things for the class and ROS
     # Can only be called once
@@ -37,6 +42,12 @@ class CarControl():
             self.thread.setDaemon(True)
             # Start the thread
             self.thread.start()
+            # Init pump publisher thread
+            self.pump_thread = threading.Thread(target=self.pump_publisher, args=[])
+            # Set as daemon thread to end with the main thread
+            self.pump_thread.setDaemon(True)
+            # Start the thread
+            self.pump_thread.start()
             # Change the running status to True
             self.running = True
             # Status of listener
@@ -48,6 +59,23 @@ class CarControl():
 
         else:
             pass
+
+    # Pump publisher function
+    def pump_publisher(self):
+        while True:
+            if self.pump_trigger:
+                print('Pumping triggered')
+                # Construct a data structure to pass to pump
+                string = String()
+                if self.pumping:
+                    string.data = 'H'
+                else:
+                    string.data = 'G'
+                print('Pump status updated to: ' + str(string.data))
+                self.pump_controller.publish(string)
+                self.pump_trigger = False
+            else:
+                pass
 
     # Publisher that runs inside of the child thread, listen to the information of main loop and publish it to the car
     def publish(self):
@@ -141,6 +169,16 @@ class CarControl():
                 else:
                     print('---Started Listening---')
                     self.listening = True
+            elif usr_in == '4':
+                tmp = input('H for start pumping, G for stop pumping')
+                if tmp == 'H':
+                    self.pumping = True
+                    self.pump_trigger = True
+                elif tmp == 'G':
+                    self.pumping = False
+                    self.pump_trigger = True
+                else:
+                    print('Command not found...')
             else:
                 pass
 
