@@ -25,7 +25,7 @@ class CarControl():
         self.counter = 0
         self.location = None
         self.time = time.time()
-        self.pump_controller = rospy.Publisher('toggle',String, queue_size=1)
+        self.pump_controller = rospy.Publisher('toggle',String, queue_size=10)
         self.pump_thread = None
         self.pumping = False
         self.pump_trigger = False
@@ -179,8 +179,10 @@ class CarControl():
                     self.pump_trigger = True
                 else:
                     print('Command not found...')
+                print('Hihihi')
             else:
                 pass
+            # print('Testing')
 
 
     
