@@ -2,8 +2,10 @@ import rospy, threading, time
 from geometry_msgs.msg import Twist
 from std_msgs.msg import String
 from Car_Control_Data import patterns as preset_data
-from Car_Control_Data import Location
-from sensor_msgs.msg import Imu
+from Car_Control_Data import paints as paint_patterns
+# from Car_Control_Data import Location
+# from sensor_msgs.msg import Imu
+import datetime as dt
 
 import io
 import sys
@@ -14,8 +16,11 @@ import sys
 class CarControl():
     def __init__(self):
         # Define some global variables around the whole class
+        # Moving status of the whole car
         self.moving = False
+        # ROS topic publisher towards the car control topic 'cmd_vel'
         self.publisher = rospy.Publisher('cmd_vel', Twist, queue_size=1)
+        # Init the speed of the car
         self.speed = [0, 0, 0, 0]
         self.running = False
         self.thread = None
@@ -29,6 +34,7 @@ class CarControl():
         self.pump_thread = None
         self.pumping = False
         self.pump_trigger = False
+        self.painting = False
     
     # Function start, first to call after the __init__ function to start essentail things for the class and ROS
     # Can only be called once
@@ -50,12 +56,12 @@ class CarControl():
             self.pump_thread.start()
             # Change the running status to True
             self.running = True
-            # Status of listener
-            self.listening = False
-            # Start the listener thread
-            self.subscriber = rospy.Subscriber('/imu', Imu, self.listen, queue_size=1000)
-            # Construct the Location data structure without init
-            self.location = Location()
+            # # Status of listener
+            # self.listening = False
+            # # Start the listener thread
+            # self.subscriber = rospy.Subscriber('/imu', Imu, self.listen, queue_size=1000)
+            # # Construct the Location data structure without init
+            # self.location = Location()
 
         else:
             pass
@@ -69,9 +75,10 @@ class CarControl():
                 string = String()
                 if self.pumping:
                     string.data = 'H'
+                    print('Pump status updated to: open')
                 else:
                     string.data = 'G'
-                print('Pump status updated to: ' + str(string.data))
+                    print('Pump status updated to: close')
                 self.pump_controller.publish(string)
                 self.pump_trigger = False
             else:
@@ -81,7 +88,9 @@ class CarControl():
     def publish(self):
         while True:
             if self.moving:
-                print('Publishing')
+                # print('Publishing')
+                print('\n')
+                print(dt.datetime.now())
                 # Construct a data structure to pass to cmd_vel
                 twist = Twist()
                 twist.linear.x = self.speed[0]
@@ -107,6 +116,16 @@ class CarControl():
             # Force format conversion in case there is anything wrong
             self.speed[i] = float(speed[i])
     
+    def paintStatus(self, paint):
+        if self.painting == paint:
+            print('Painting status remains ' + str(paint))
+        else:
+            self.paintTrigger(paint)
+            print('Painting status updated to ' + str(paint) + ' from ' + str(self.painting))
+            self.painting = paint
+        
+        
+
     # Several default modes to go according to the predefined mode
     def default(self, pattern):
         usr_in = int(pattern)
@@ -121,26 +140,53 @@ class CarControl():
                 time.sleep(preset.delay[i])
         else:
             pass
-    # Listener towards the IMU data
-    def listen(self, imu):
-        if self.listening == True:
-            # Retrive the orientation data in the format of Quanternion
-            # Data comes from the Megnatic sensor within the IMU module
-            # self.time = time.time()
-            self.location.Update(imu)
-            self.location.Calculate_Vel()
-            self.location.Calculate_Dis()
-            # print('update:', time.time() - self.time)
-            # self.time = time.time()
-            # with open('./Log.txt', 'a') as f:
-                # if self.counter % 50 == 0:
-            # rospy.loginfo(str(self.location.Print()))
-            # print(str(self.location.Print()), flush=True)
-                # print(str(self.location.Print()), file=f)
-                # self.counter += 1
-            # print('print', time.time() - self.time)
+        
+    def paintDefault(self, num):
+        num = int(num)
+        if num >= 1 and num <= len(paint_patterns) - 1:
+            pattern = paint_patterns[num]
+            print(pattern.name)
+            for i in range(len(pattern.delay)):
+                if i < len(pattern.delay) - 1:
+                    self.update(True, pattern.speed[i])
+                    self.paintStatus(pattern.paint[i])
+                else:
+                    self.update(False, pattern.speed[i])
+                    self.paintStatus(pattern.paint[i])
+                time.sleep(pattern.delay[i])
         else:
             pass
+    
+    def paintTrigger(self, status):
+        if status:
+            self.pumping = True
+            self.pump_trigger = True
+        else:
+            self.pumping = False
+            self.pump_trigger = True
+
+
+    
+    # # Listener towards the IMU data
+    # def listen(self, imu):
+    #     if self.listening == True:
+    #         # Retrive the orientation data in the format of Quanternion
+    #         # Data comes from the Megnatic sensor within the IMU module
+    #         # self.time = time.time()
+    #         self.location.Update(imu)
+    #         self.location.Calculate_Vel()
+    #         self.location.Calculate_Dis()
+    #         # print('update:', time.time() - self.time)
+    #         # self.time = time.time()
+    #         # with open('./Log.txt', 'a') as f:
+    #             # if self.counter % 50 == 0:
+    #         # rospy.loginfo(str(self.location.Print()))
+    #         # print(str(self.location.Print()), flush=True)
+    #             # print(str(self.location.Print()), file=f)
+    #             # self.counter += 1
+    #         # print('print', time.time() - self.time)
+    #     else:
+    #         pass
 
     # Run function for the mainloop
     def run(self):
@@ -160,26 +206,33 @@ class CarControl():
                 speed =  [0, 0, 0, 0]
                 control.update(False, speed)
             elif usr_in == '2':
-                tmp = input('Command: ' + preset_data[0])
+                tmp = input('Command Intro: ' + preset_data[0])
                 control.default(tmp)
             elif usr_in == '3':
-                if self.listening == True:
-                    print('---Stopped Listening---')
-                    self.listening = False
-                else:
-                    print('---Started Listening---')
-                    self.listening = True
+                # if self.listening == True:
+                #     print('---Stopped Listening---')
+                #     self.listening = False
+                # else:
+                #     print('---Started Listening---')
+                #     self.listening = True
+                print('IMU funtion has been disabled... for now.')
             elif usr_in == '4':
                 tmp = input('H for start pumping, G for stop pumping')
                 if tmp == 'H':
-                    self.pumping = True
-                    self.pump_trigger = True
+                    self.paintTrigger(True)
+                    # self.pumping = True
+                    # self.pump_trigger = True
                 elif tmp == 'G':
-                    self.pumping = False
-                    self.pump_trigger = True
+                    self.paintTrigger(False)
+                    # self.pumping = False
+                    # self.pump_trigger = True
                 else:
                     print('Command not found...')
                 print('Hihihi')
+            elif usr_in == '5':
+                tmp = input('Command Intro: ' + paint_patterns[0])
+                control.paintDefault(tmp)
+
             else:
                 pass
             # print('Testing')
