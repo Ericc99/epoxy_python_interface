@@ -423,7 +423,7 @@ paint_s1 = [
     [0.03, 0, 0, 0],
     [0, 0, 0, 0]
 ]
-paint_d1 = [0.2, 0.2, 0.2, 0.2, 5.5, 0.2, 0.2, 0.2, 0.2, 0]
+paint_d1 = [0.2, 0.2, 0.2, 0.2, 25, 0.2, 0.2, 0.2, 0.2, 0]
 painting1 = [True, True, True, True, True, True, True, True, True, False]
 
 paint1.Set_Speed(paint_s1)
